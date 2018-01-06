@@ -130,6 +130,21 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 	//   and the following is a good resource for the actual equation to implement (look at equation 
 	//   3.33
 	//   http://planning.cs.uiuc.edu/node99.html
+	for (auto& particle : particles) {
+
+		vector<LandmarkObs> transformed;
+		// Since theta doesn't change during loop, only compute sin() and cos() once.
+		double sin_theta = sin(particle.theta);
+		double cos_theta = cos(particle.theta);
+		for (auto& observation : observations) {
+			double x = observation.x * cos_theta - observation.y * sin_theta
+					+ particle.x;
+			double y = observation.x * sin_theta + observation.y * cos_theta
+					+ particle.y;
+			transformed.push_back( { observation.id, x, y });
+		}
+		weights[particle.id] = particle.weight;
+	}
 }
 
 void ParticleFilter::resample() {
