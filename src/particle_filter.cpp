@@ -65,7 +65,7 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
 
 	default_random_engine gen;
 
-	for (Particle& particle : particles) {
+	for (auto& particle : particles) {
 		double new_x, new_y, new_theta;
 
 		if (yaw_rate == 0) {
@@ -104,10 +104,10 @@ void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted,
 	//   observed measurement to this particular landmark.
 	// NOTE: this method will NOT be called by the grading code. But you will probably find it useful to 
 	//   implement this method and use it as a helper during the updateWeights phase.
-    for (LandmarkObs& observation: observations){
+    for (auto& observation: observations){
 
         double current_minimum = numeric_limits<double>::infinity();
-        for (LandmarkObs& predict : predicted){
+        for (auto& predict : predicted){
             double euclidean_distance = dist(predict.x, predict.y, observation.x, observation.y);
             if (euclidean_distance < current_minimum){
             	current_minimum = euclidean_distance;
