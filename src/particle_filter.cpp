@@ -143,6 +143,19 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 					+ particle.y;
 			transformed.push_back( { observation.id, x, y });
 		}
+
+		vector<LandmarkObs> predicted;
+		for (auto& landmark : map_landmarks.landmark_list) {
+			double euclidean_distance = dist(landmark.x_f, landmark.y_f,
+					particle.x, particle.y);
+			if (euclidean_distance < sensor_range) {
+				predicted.push_back(
+						{landmark.id_i, landmark.x_f, landmark.y_f });
+			}
+		}
+
+		dataAssociation(predicted, transformed);
+
 		weights[particle.id] = particle.weight;
 	}
 }
