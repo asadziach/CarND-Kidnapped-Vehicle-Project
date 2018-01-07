@@ -31,8 +31,8 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 	num_particles = NUM_PARTICALS;
 
 	// Little optimization since we know the size in advance.
-    particles.reserve(num_particles);
-    weights.reserve(num_particles);
+	particles.reserve(num_particles);
+	weights.reserve(num_particles);
 
 	// This line creates a normal (Gaussian) distribution for x
 	normal_distribution<double> dist_x(x, std[0]);
@@ -49,7 +49,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 		double weight = 1.0;
 
 		weights.push_back(weight);
-		particles.push_back({i , x, y, theta, weight});
+		particles.push_back( { i, x, y, theta, weight });
 
 	}
 
@@ -69,10 +69,8 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
 		double new_x, new_y, new_theta;
 
 		if (yaw_rate == 0) {
-			new_x = particle.x
-					+ velocity * delta_t * cos(particle.theta);
-			new_y = particle.y
-					+ velocity * delta_t * sin(particle.theta);
+			new_x = particle.x + velocity * delta_t * cos(particle.theta);
+			new_y = particle.y + velocity * delta_t * sin(particle.theta);
 			new_theta = particle.theta;
 		} else {
 			new_x = particle.x
@@ -82,9 +80,7 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
 			new_y = particle.y
 					+ velocity / yaw_rate
 							* (cos(particle.theta)
-									- cos(
-											particle.theta
-													+ yaw_rate * delta_t));
+									- cos(particle.theta + yaw_rate * delta_t));
 			new_theta = particle.theta + yaw_rate * delta_t;
 		}
 		normal_distribution<double> dist_x(new_x, std_pos[0]);
@@ -104,17 +100,18 @@ void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted,
 	//   observed measurement to this particular landmark.
 	// NOTE: this method will NOT be called by the grading code. But you will probably find it useful to 
 	//   implement this method and use it as a helper during the updateWeights phase.
-    for (auto& observation: observations){
+	for (auto& observation : observations) {
 
-        double current_minimum = numeric_limits<double>::infinity();
-        for (auto& predict : predicted){
-            double euclidean_distance = dist(predict.x, predict.y, observation.x, observation.y);
-            if (euclidean_distance < current_minimum){
-            	current_minimum = euclidean_distance;
-                observation.id = predict.id;
-            }
-        }
-    }
+		double current_minimum = numeric_limits<double>::infinity();
+		for (auto& predict : predicted) {
+			double euclidean_distance = dist(predict.x, predict.y,
+					observation.x, observation.y);
+			if (euclidean_distance < current_minimum) {
+				current_minimum = euclidean_distance;
+				observation.id = predict.id;
+			}
+		}
+	}
 }
 
 void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
@@ -198,7 +195,7 @@ void ParticleFilter::resample() {
 		double theta = p.theta;
 		double weight = 1.0;
 
-		resampled.push_back({i , x, y, theta, weight});
+		resampled.push_back( { i, x, y, theta, weight });
 	}
 	particles = resampled;
 }
