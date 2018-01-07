@@ -115,7 +115,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
   // Pre-calculate frequently used terms.
   double x_variance_2 = 2 * x_sigma * x_sigma;
   double y_variance_2 = 2 * y_sigma * y_sigma;
-
+  double normalizer = 2 * M_PI * x_sigma * y_sigma;
   for (auto& particle : particles) {
 
     /* Step: A
@@ -164,7 +164,6 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
      */
     for (auto& obs : transformed) {
       Map::single_landmark_s landmark = map_landmarks.landmark_list[obs.id - 1];
-      double normalizer = 2 * M_PI * x_sigma * y_sigma;
       double x_square = pow(obs.x - landmark.x_f, 2);
       double y_square = pow(obs.y - landmark.y_f, 2);
       double exponent = exp(
