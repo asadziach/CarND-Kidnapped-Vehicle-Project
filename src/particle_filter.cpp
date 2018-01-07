@@ -150,12 +150,33 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 					particle.x, particle.y);
 			if (euclidean_distance < sensor_range) {
 				predicted.push_back(
-						{landmark.id_i, landmark.x_f, landmark.y_f });
+						{ landmark.id_i, landmark.x_f, landmark.y_f });
 			}
 		}
 
 		dataAssociation(predicted, transformed);
 
+		for (auto& obs : transformed) {
+			Map::single_landmark_s landmark = map_landmarks.landmark_list[obs.id
+					- 1];
+
+			double sigma_x = std_landmark[0];
+			double sigma_y = std_landmark[1];
+
+			double normalizer = 2 * M_PI * sigma_x * sigma_y;
+
+			double x_square = pow(obs.x - landmark.x_f, 2);
+			double y_square = pow(obs.y - landmark.y_f, 2);
+
+			double x_term = x_square / (2 * sigma_x * sigma_x);
+			double y_term = y_square / (2 * sigma_y * sigma_y);
+
+			double exponent = exp(-(x_term + y_term));
+
+			double weight = exponent / normalizer;
+
+			particle.weight *= weight;
+		}
 		weights[particle.id] = particle.weight;
 	}
 }
@@ -175,7 +196,7 @@ void ParticleFilter::resample() {
 		double x = p.x;
 		double y = p.y;
 		double theta = p.theta;
-		double weight = p.weight;
+		double weight = 1.0;
 
 		resampled.push_back({i , x, y, theta, weight});
 	}
